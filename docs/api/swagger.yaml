@@ -1,0 +1,146 @@
+openapi: 3.0.0
+info:
+  title: "Meu Banco Digital API"
+  description: "API para o core bancário do projeto Meu Banco Digital. Esta definição cobre o fluxo de Onboarding e Autenticação."
+  version: "1.0.0"
+
+servers:
+  - url: "http://localhost:8080/api/v1"
+    description: "Servidor de Desenvolvimento Local"
+
+paths:
+  /onboarding/start:
+    post:
+      tags:
+        - Onboarding
+      summary: "Inicia o processo de cadastro do usuário"
+      description: "Recebe os dados iniciais do usuário (CPF, nome, e-mail), cria um registro com status pendente e dispara o e-mail de verificação."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cpf:
+                  type: string
+                  description: "CPF do usuário (apenas números)."
+                  example: "12345678900"
+                fullName:
+                  type: string
+                  description: "Nome completo do usuário."
+                  example: "João da Silva"
+                email:
+                  type: string
+                  format: email
+                  description: "E-mail do usuário, para onde o link de verificação será enviado."
+                  example: "joao.silva@email.com"
+              required:
+                - cpf
+                - fullName
+                - email
+      responses:
+        '202':
+          description: "Requisição aceita. O e-mail de verificação está sendo enviado."
+        '400':
+          description: "Dados inválidos (ex: formato de e-mail ou CPF incorreto)."
+        '409':
+          description: "Conflito. O CPF ou E-mail já está cadastrado."
+
+  /onboarding/verify:
+    get:
+      tags:
+        - Onboarding
+      summary: "Valida o token de verificação de e-mail"
+      description: "Endpoint acessado pelo 'link mágico' enviado ao e-mail do usuário. O frontend deve chamar este endpoint para validar o token antes de exibir a tela de criação de senha."
+      parameters:
+        - name: token
+          in: query
+          required: true
+          description: "O token de verificação enviado por e-mail."
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "Token válido. O usuário pode prosseguir para a criação de senha."
+        '400':
+          description: "Token inválido, expirado ou não fornecido."
+  
+  /onboarding/complete:
+    post:
+      tags:
+        - Onboarding
+      summary: "Completa o cadastro com a criação da senha"
+      description: "Define a senha do usuário, finalizando o processo de cadastro e ativando a conta."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: "O mesmo token que foi validado na etapa de verificação."
+                  example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                password:
+                  type: string
+                  format: password
+                  description: "A senha escolhida pelo usuário."
+                  example: "S3nh@F0rt3!"
+              required:
+                - token
+                - password
+      responses:
+        '200':
+          description: "Cadastro concluído com sucesso. O usuário pode agora fazer login."
+        '400':
+          description: "Token inválido ou a senha não atende aos critérios de segurança."
+
+  /auth/login:
+    post:
+      tags:
+        - Autenticação
+      summary: "Autentica um usuário e retorna um token JWT"
+      description: "Valida as credenciais do usuário e, se corretas, retorna um token de acesso (JWT) para ser usado em requisições autenticadas."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: "E-mail do usuário."
+                  example: "joao.silva@email.com"
+                password:
+                  type: string
+                  format: password
+                  description: "Senha do usuário."
+                  example: "S3nh@F0rt3!"
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: "Login bem-sucedido."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    description: "Token JWT para autorização."
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      name:
+                        type: string
+        '401':
+          description: "Não autorizado. Credenciais inválidas."
