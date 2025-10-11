@@ -1,0 +1,50 @@
+    
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    /* Estilos básicos para garantir a legibilidade */
+    body { font-family: sans-serif; color: #333; }
+    .container { max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; }
+    .button { background-color: #007bff; color: white; padding: 15px 25px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; border-radius: 5px; }
+    .footer { font-size: 12px; color: #777; margin-top: 20px; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 1. Logo (Branding) -->
+    <!-- <img src="URL_DO_SEU_LOGO" alt="GoBank" width="150"> -->
+    
+    <h2>Quase lá! Confirme seu e-mail</h2>
+
+    <!-- 2. Saudação e Contexto -->
+    <p>Olá, <strong>{{.FullName}}</strong>,</p>
+    <p>Obrigado por iniciar seu cadastro no GoBank. Para garantir a segurança da sua conta, por favor, confirme seu endereço de e-mail clicando no botão abaixo.</p>
+
+    <!-- 3. O Call to Action (CTA) -->
+    <p style="text-align: center; margin: 30px 0;">
+      <a href="{{.VerificationLink}}" class="button">Ativar Minha Conta</a>
+    </p>
+
+    <!-- 4. Link Alternativo (Fallback) -->
+    <p>Se o botão não funcionar, por favor, copie e cole o seguinte link no seu navegador:</p>
+    <p><a href="{{.VerificationLink}}">{{.VerificationLink}}</a></p>
+
+    <!-- 5. Informações de Segurança -->
+    <hr>
+    <p style="font-size: 14px; color: #555;">
+      Por segurança, este link de ativação expirará em <strong>1 hora</strong>.
+    </p>
+    <p style="font-size: 14px; color: #555;">
+      Se você não tentou criar uma conta, nenhuma ação é necessária. Por favor, ignore este e-mail.
+    </p>
+  </div>
+  
+  <div class="footer">
+    <p>&copy; 2025 GoBank. Todos os direitos reservados.</p>
+    <p>Você recebeu este e-mail porque um cadastro foi iniciado com este endereço.</p>
+  </div>
+</body>
+</html>
+
+  
