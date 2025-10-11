@@ -1,0 +1,17 @@
+.git
+.gitignore
+
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+*.md
+
+main
+app
+*.exe
+
+.vscode/
+.idea/
+
+.env
