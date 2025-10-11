@@ -22,7 +22,7 @@ paths:
             schema:
               type: object
               properties:
-                cpf:
+                document:
                   type: string
                   description: "CPF do usuário (apenas números)."
                   example: "12345678900"
@@ -36,7 +36,7 @@ paths:
                   description: "E-mail do usuário, para onde o link de verificação será enviado."
                   example: "joao.silva@email.com"
               required:
-                - cpf
+                - document
                 - fullName
                 - email
       responses:
