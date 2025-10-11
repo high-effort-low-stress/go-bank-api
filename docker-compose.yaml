@@ -1,0 +1,22 @@
+services:
+  go-bank-api:
+    build: .
+    image: go-bank-api:latest
+    container_name: go-bank-api
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    
+    # (Opcional) Define variáveis de ambiente para a sua aplicação
+    environment:
+      - GIN_MODE=release
+      - PORT=8080
+      # - DATABASE_URL=postgres://user:password@db:5432/mydatabase?sslmode=disable
+
+# (Opcional) Se você precisar de um banco de dados, pode adicioná-lo aqui.
+# networks:
+#   default:
+#     name: go-network
+
+# volumes:
+#   postgres_data:
