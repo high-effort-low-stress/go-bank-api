@@ -17,6 +17,7 @@ WORKDIR /app
 
 COPY --from=builder /app/main .
 COPY --from=builder /app/.env .
+COPY --from=builder /app/templates ./templates
 
 EXPOSE 8080
 
