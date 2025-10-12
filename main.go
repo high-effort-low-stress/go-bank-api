@@ -30,7 +30,7 @@ func main() {
 
 	// Dependencies
 	onboardingRequestRepository := repositories.NewOnboardingRequestRepository(db)
-	onboardingService := services.NewOnboardingService(onboardingRequestRepository, emailService)
+	onboardingService := services.NewOnboardingService(onboardingRequestRepository, emailService, nil)
 	onboardingController := controllers.NewOnboardingController(onboardingService)
 
 	server := gin.Default()
