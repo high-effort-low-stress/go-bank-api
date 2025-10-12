@@ -28,7 +28,7 @@ type OnboardingService interface {
 type onboardingService struct {
 	repo     repositories.OnboardingRequestRepository
 	emailSvc EmailService
-	wg       *sync.WaitGroup // Add a WaitGroup for testing purposes
+	wg       *sync.WaitGroup
 }
 
 func NewOnboardingService(repo repositories.OnboardingRequestRepository, emailSvc EmailService, wg *sync.WaitGroup) OnboardingService {
@@ -70,8 +70,6 @@ func (s *onboardingService) StartOnboardingProcess(document, fullName, email str
 		return ErrInternalServer
 	}
 
-	// Dispara o e-mail de verificação em uma goroutine para não bloquear a resposta HTTP.
-	// If wg is not nil (i.e., in a test), we increment the counter.
 	s.sendEmail(fullName, email, rawToken)
 
 	log.Println("Onboarding process started successfully")
@@ -96,6 +94,7 @@ func (s *onboardingService) sendEmail(fullName, email, rawToken string) {
 	if s.wg != nil {
 		s.wg.Add(1)
 	}
+
 	go func() {
 		if s.wg != nil {
 			defer s.wg.Done()
