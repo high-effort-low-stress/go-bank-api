@@ -5,10 +5,11 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/high-effort-low-stress/go-bank-api/controllers"
-	"github.com/high-effort-low-stress/go-bank-api/database"
-	"github.com/high-effort-low-stress/go-bank-api/repositories"
-	"github.com/high-effort-low-stress/go-bank-api/services"
+	"github.com/high-effort-low-stress/go-bank-api/internal/database"
+	"github.com/high-effort-low-stress/go-bank-api/internal/notification"
+	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/controllers"
+	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/repositories"
+	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/services"
 	"github.com/joho/godotenv"
 )
 
@@ -23,7 +24,7 @@ func main() {
 	database.Connect()
 	db := database.DB
 
-	emailService, err := services.NewEmailService()
+	emailService, err := notification.NewEmailService()
 	if err != nil {
 		log.Fatalf("Failed to initialize EmailService: %v", err)
 	}
