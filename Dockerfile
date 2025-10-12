@@ -8,6 +8,8 @@ RUN go mod download
 
 COPY . .
 
+WORKDIR /app/cmd/api
+
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /app/main .
 
 
