@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/high-effort-low-stress/go-bank-api/models"
@@ -27,10 +28,11 @@ type OnboardingService interface {
 type onboardingService struct {
 	repo     repositories.OnboardingRequestRepository
 	emailSvc EmailService
+	wg       *sync.WaitGroup // Add a WaitGroup for testing purposes
 }
 
-func NewOnboardingService(repo repositories.OnboardingRequestRepository, emailSvc EmailService) OnboardingService {
-	return &onboardingService{repo: repo, emailSvc: emailSvc}
+func NewOnboardingService(repo repositories.OnboardingRequestRepository, emailSvc EmailService, wg *sync.WaitGroup) OnboardingService {
+	return &onboardingService{repo: repo, emailSvc: emailSvc, wg: wg}
 }
 
 func (s *onboardingService) StartOnboardingProcess(document, fullName, email string) error {
@@ -69,11 +71,8 @@ func (s *onboardingService) StartOnboardingProcess(document, fullName, email str
 	}
 
 	// Dispara o e-mail de verificação em uma goroutine para não bloquear a resposta HTTP.
-	go func() {
-		if err := s.emailSvc.SendVerificationEmail(fullName, email, rawToken); err != nil {
-			log.Printf("CRITICAL: Failed to send verification email to %s: %v", email, err)
-		}
-	}()
+	// If wg is not nil (i.e., in a test), we increment the counter.
+	s.sendEmail(fullName, email, rawToken)
 
 	log.Println("Onboarding process started successfully")
 	return nil
@@ -91,4 +90,18 @@ func generateVerificationToken() (rawToken string, hashedToken string, err error
 	hashedToken = hex.EncodeToString(hasher.Sum(nil))
 
 	return rawToken, hashedToken, nil
+}
+
+func (s *onboardingService) sendEmail(fullName, email, rawToken string) {
+	if s.wg != nil {
+		s.wg.Add(1)
+	}
+	go func() {
+		if s.wg != nil {
+			defer s.wg.Done()
+		}
+		if err := s.emailSvc.SendVerificationEmail(fullName, email, rawToken); err != nil {
+			log.Printf("CRITICAL: Failed to send verification email to %s: %v", email, err)
+		}
+	}()
 }
