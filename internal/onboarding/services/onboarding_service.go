@@ -5,13 +5,17 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"log"
+	"os"
 	"sync"
 	"time"
 
-	"github.com/high-effort-low-stress/go-bank-api/models"
-	"github.com/high-effort-low-stress/go-bank-api/repositories"
-	"github.com/high-effort-low-stress/go-bank-api/utils"
+	"github.com/high-effort-low-stress/go-bank-api/internal/notification"
+	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/models"
+	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/repositories"
+	"github.com/high-effort-low-stress/go-bank-api/internal/validators"
+
 	"gorm.io/gorm"
 )
 
@@ -21,22 +25,24 @@ var (
 	ErrInternalServer = errors.New("Ocorreu um erro inesperado")
 )
 
+var VerificationEmailTemplatePath = "templates/verification_email.html"
+
 type OnboardingService interface {
 	StartOnboardingProcess(document, fullName, email string) error
 }
 
 type onboardingService struct {
 	repo     repositories.OnboardingRequestRepository
-	emailSvc EmailService
+	emailSvc notification.EmailService
 	wg       *sync.WaitGroup
 }
 
-func NewOnboardingService(repo repositories.OnboardingRequestRepository, emailSvc EmailService, wg *sync.WaitGroup) OnboardingService {
+func NewOnboardingService(repo repositories.OnboardingRequestRepository, emailSvc notification.EmailService, wg *sync.WaitGroup) OnboardingService {
 	return &onboardingService{repo: repo, emailSvc: emailSvc, wg: wg}
 }
 
 func (s *onboardingService) StartOnboardingProcess(document, fullName, email string) error {
-	if !utils.IsValidCPF(document) {
+	if !validators.IsValidCPF(document) {
 		return ErrInvalidCPF
 	}
 
@@ -70,7 +76,18 @@ func (s *onboardingService) StartOnboardingProcess(document, fullName, email str
 		return ErrInternalServer
 	}
 
-	s.sendEmail(fullName, email, rawToken)
+	if s.wg != nil {
+		s.wg.Add(1)
+	}
+
+	go func() {
+		if s.wg != nil {
+			defer s.wg.Done()
+		}
+		if err := s.sendEmail(fullName, email, rawToken); err != nil {
+			log.Printf("CRITICAL: Failed to send verification email to %s: %v", email, err)
+		}
+	}()
 
 	log.Println("Onboarding process started successfully")
 	return nil
@@ -90,17 +107,32 @@ func generateVerificationToken() (rawToken string, hashedToken string, err error
 	return rawToken, hashedToken, nil
 }
 
-func (s *onboardingService) sendEmail(fullName, email, rawToken string) {
-	if s.wg != nil {
-		s.wg.Add(1)
+func (s *onboardingService) sendEmail(fullName, email, rawToken string) error {
+	subject := "Bem-vindo ao GoBank! Confirme seu e-mail."
+	verificationLink := fmt.Sprintf("%s?token=%s", os.Getenv("FRONTEND_VERIFICATION_URL"), rawToken)
+
+	templateData := struct {
+		FullName         string
+		Subject          string
+		VerificationLink string
+	}{
+		FullName:         fullName,
+		Subject:          subject,
+		VerificationLink: verificationLink,
 	}
 
-	go func() {
-		if s.wg != nil {
-			defer s.wg.Done()
-		}
-		if err := s.emailSvc.SendVerificationEmail(fullName, email, rawToken); err != nil {
-			log.Printf("CRITICAL: Failed to send verification email to %s: %v", email, err)
-		}
-	}()
+	emailRequest := &notification.EmailRequest{
+		From:         os.Getenv("EMAIL_FROM"),
+		To:           email,
+		Subject:      subject,
+		TemplatePath: VerificationEmailTemplatePath,
+		TemplateData: templateData,
+	}
+
+	if err := s.emailSvc.SendEmail(emailRequest); err != nil {
+		return err
+	}
+
+	return nil
+
 }

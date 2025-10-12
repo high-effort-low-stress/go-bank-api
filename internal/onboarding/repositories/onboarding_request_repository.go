@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"github.com/high-effort-low-stress/go-bank-api/models"
+	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/models"
 	"gorm.io/gorm"
 )
 

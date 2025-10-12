@@ -1,4 +1,4 @@
-package utils
+package http_helpers
 
 import (
 	"fmt"

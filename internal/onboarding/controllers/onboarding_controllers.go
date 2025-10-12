@@ -6,8 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/high-effort-low-stress/go-bank-api/services"
-	"github.com/high-effort-low-stress/go-bank-api/utils"
+	"github.com/high-effort-low-stress/go-bank-api/internal/http_helpers"
+	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/services"
 )
 
 type StartOnboardingRequest struct {
@@ -31,7 +31,7 @@ func (ctrl *OnboardingController) StartOnboarding(c *gin.Context) {
 		if validationErrors, ok := err.(validator.ValidationErrors); ok {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error":   "Dados inválidos",
-				"details": utils.FormatValidationErrors(validationErrors),
+				"details": http_helpers.FormatValidationErrors(validationErrors),
 			})
 			return
 		}

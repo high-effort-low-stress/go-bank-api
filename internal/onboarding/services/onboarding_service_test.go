@@ -4,8 +4,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/high-effort-low-stress/go-bank-api/models"
-	"github.com/high-effort-low-stress/go-bank-api/services"
+	"github.com/high-effort-low-stress/go-bank-api/internal/notification"
+	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/models"
+	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/services"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"gorm.io/gorm"
@@ -32,8 +33,8 @@ type MockEmailService struct {
 	mock.Mock
 }
 
-func (m *MockEmailService) SendVerificationEmail(fullName, to, token string) error {
-	args := m.Called(fullName, to, token)
+func (m *MockEmailService) SendEmail(req *notification.EmailRequest) error {
+	args := m.Called(req)
 	return args.Error(0)
 }
 
@@ -49,7 +50,7 @@ func TestStartOnboardingProcess_Success(t *testing.T) {
 
 	mockRepo.On("FindByDocumentOrEmail", validDocument, email).Return(nil, gorm.ErrRecordNotFound)
 	mockRepo.On("Create", mock.AnythingOfType("*models.OnboardingRequest")).Return(nil)
-	mockEmailSvc.On("SendVerificationEmail", fullName, email, mock.AnythingOfType("string")).Return(nil)
+	mockEmailSvc.On("SendEmail", mock.AnythingOfType("*notification.EmailRequest")).Return(nil)
 
 	err := service.StartOnboardingProcess(validDocument, fullName, email)
 
@@ -81,7 +82,7 @@ func TestStartOnboardingProcess_UserAlreadyExists(t *testing.T) {
 	mockRepo.AssertExpectations(t)
 
 	wg.Wait()
-	mockEmail.AssertNotCalled(t, "SendVerificationEmail", mock.Anything, mock.Anything, mock.Anything)
+	mockEmail.AssertNotCalled(t, "SendEmail", mock.Anything, mock.Anything, mock.Anything)
 }
 
 func TestStartOnboardingProcess_InvalidCPF(t *testing.T) {
@@ -101,5 +102,5 @@ func TestStartOnboardingProcess_InvalidCPF(t *testing.T) {
 	mockRepo.AssertNotCalled(t, "FindByDocumentOrEmail")
 
 	wg.Wait()
-	mockEmail.AssertNotCalled(t, "SendVerificationEmail", mock.Anything, mock.Anything, mock.Anything)
+	mockEmail.AssertNotCalled(t, "SendEmail", mock.Anything, mock.Anything, mock.Anything)
 }

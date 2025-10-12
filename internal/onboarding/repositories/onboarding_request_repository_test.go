@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/high-effort-low-stress/go-bank-api/models"
-	"github.com/high-effort-low-stress/go-bank-api/repositories"
+	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/models"
+	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/repositories"
 	"github.com/high-effort-low-stress/go-bank-api/testutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -27,6 +27,8 @@ var (
 	ctx               context.Context
 )
 
+var sqldir string = filepath.Join("..", "..", "..", "sql")
+
 func TestMain(m *testing.M) {
 	ctx = context.Background()
 	var err error
@@ -37,7 +39,7 @@ func TestMain(m *testing.M) {
 
 	postgresContainer, err = postgres.Run(ctx,
 		"postgres:17.5-alpine",
-		postgres.WithInitScripts(filepath.Join("..", "sql", "migrations", "01-create-onboarding.sql")),
+		postgres.WithInitScripts(filepath.Join(sqldir, "migrations", "01-create-onboarding.sql")),
 		postgres.WithDatabase(dbName),
 		postgres.WithUsername(dbUser),
 		postgres.WithPassword(dbPassword),
@@ -91,7 +93,7 @@ func TestOnboardingRequestFindByDocumentOrEmail(t *testing.T) {
 		expectedPublicId := "01ARZ3NDEKTSV4RRFFQ69G5FAV"
 		expectedDocument := "12345678901"
 
-		insertDB, err := testutil.ReadFileContent(filepath.Join("..", "sql", "test", "add-onboarding-requests.sql"))
+		insertDB, err := testutil.ReadFileContent(filepath.Join(sqldir, "test", "add-onboarding-requests.sql"))
 		require.NoError(t, err)
 
 		db.Exec(insertDB)
