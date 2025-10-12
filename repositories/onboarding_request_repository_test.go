@@ -10,6 +10,7 @@ import (
 
 	"github.com/high-effort-low-stress/go-bank-api/models"
 	"github.com/high-effort-low-stress/go-bank-api/repositories"
+	"github.com/high-effort-low-stress/go-bank-api/testutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/testcontainers/testcontainers-go"
@@ -20,20 +21,23 @@ import (
 )
 
 var (
-	db   *gorm.DB
-	repo repositories.OnboardingRequestRepository
+	db                *gorm.DB
+	repo              repositories.OnboardingRequestRepository
+	postgresContainer *postgres.PostgresContainer
+	ctx               context.Context
 )
 
 func TestMain(m *testing.M) {
-	ctx := context.Background()
+	ctx = context.Background()
+	var err error
 
 	dbName := "public"
 	dbUser := "postgres"
 	dbPassword := "password"
 
-	postgresContainer, err := postgres.Run(ctx,
+	postgresContainer, err = postgres.Run(ctx,
 		"postgres:17.5-alpine",
-		postgres.WithInitScripts(filepath.Join("..", "sql", "migrations", "01_create-onboarding.sql")),
+		postgres.WithInitScripts(filepath.Join("..", "sql", "migrations", "01-create-onboarding.sql")),
 		postgres.WithDatabase(dbName),
 		postgres.WithUsername(dbUser),
 		postgres.WithPassword(dbPassword),
@@ -49,13 +53,11 @@ func TestMain(m *testing.M) {
 		}
 	}()
 
-	// Obtém a string de conexão dinâmica do contêiner
 	dsn, err := postgresContainer.ConnectionString(ctx, "sslmode=disable", "options=--search_path%3Donboarding")
 	if err != nil {
 		log.Fatalf("failed to get connection string: %s", err)
 	}
 
-	// Conecta ao banco de dados e inicializa o repositório
 	db, err = gorm.Open(postgresDriver.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("failed to connect to database: %s", err)
@@ -65,40 +67,45 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func TestOnboardingRequestRepository(t *testing.T) {
-	// Dados base para os testes
-	requestToCreate := &models.OnboardingRequest{
-		FullName:              "Integration Test User",
-		Email:                 "integration@example.com",
-		DocumentNumber:        "98765432100",
-		VerificationTokenHash: "integration-test-hash",
-		TokenExpiresAt:        time.Now().Add(1 * time.Hour),
-		Status:                models.StatusPending,
-	}
-
-	t.Run("Create", func(t *testing.T) {
+func TestOnboardingRequestCreate(t *testing.T) {
+	t.Run("#method Create", func(t *testing.T) {
+		requestToCreate := &models.OnboardingRequest{
+			FullName:              "Integration Test User",
+			Email:                 "integration@example.com",
+			DocumentNumber:        "98765432100",
+			VerificationTokenHash: "integration-test-hash",
+			TokenExpiresAt:        time.Now().Add(1 * time.Hour),
+			Status:                models.StatusPending,
+		}
 		err := repo.Create(requestToCreate)
 
 		require.NoError(t, err)
 		assert.NotEmpty(t, requestToCreate.PublicID, "PublicID should be set by BeforeCreate hook")
 	})
+}
 
-	t.Run("FindByDocumentOrEmail", func(t *testing.T) {
-		// Depende do sucesso do teste "Create"
-		require.NotEmpty(t, requestToCreate.PublicID, "Cannot run Find test if Create failed")
+func TestOnboardingRequestFindByDocumentOrEmail(t *testing.T) {
+	t.Run("#method FindByDocumentOrEmail", func(t *testing.T) {
+		expectedFullName := "Jane Doe"
+		expectedEmail := "jane.doe@example.com"
+		expectedPublicId := "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+		expectedDocument := "12345678901"
 
-		// Act
-		foundRequest, err := repo.FindByDocumentOrEmail(requestToCreate.DocumentNumber, "some-other-email@test.com")
-		foundRequest2, err := repo.FindByDocumentOrEmail("1234567810", requestToCreate.Email)
-
-		// Assert
+		insertDB, err := testutil.ReadFileContent(filepath.Join("..", "sql", "test", "add-onboarding-requests.sql"))
 		require.NoError(t, err)
-		assert.Equal(t, requestToCreate.Email, foundRequest.Email)
-		assert.Equal(t, requestToCreate.FullName, foundRequest.FullName)
-		assert.Equal(t, requestToCreate.PublicID, foundRequest.PublicID)
 
-		assert.Equal(t, requestToCreate.Email, foundRequest2.Email)
-		assert.Equal(t, requestToCreate.FullName, foundRequest2.FullName)
-		assert.Equal(t, requestToCreate.PublicID, foundRequest2.PublicID)
+		db.Exec(insertDB)
+
+		foundRequest, err := repo.FindByDocumentOrEmail(expectedDocument, "some-other-email@test.com")
+		foundRequest2, err := repo.FindByDocumentOrEmail("1234567810", expectedEmail)
+
+		require.NoError(t, err)
+		assert.Equal(t, expectedEmail, foundRequest.Email)
+		assert.Equal(t, expectedFullName, foundRequest.FullName)
+		assert.Equal(t, expectedPublicId, foundRequest.PublicID)
+
+		assert.Equal(t, expectedEmail, foundRequest2.Email)
+		assert.Equal(t, expectedFullName, foundRequest2.FullName)
+		assert.Equal(t, expectedPublicId, foundRequest2.PublicID)
 	})
 }
