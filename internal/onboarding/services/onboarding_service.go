@@ -25,7 +25,9 @@ var (
 	ErrInternalServer = errors.New("Ocorreu um erro inesperado")
 )
 
+var websiteVerifyUrl = "verify"
 var VerificationEmailTemplatePath = "templates/verification_email.html"
+var subject = "Bem-vindo ao GoBank! Confirme seu e-mail."
 
 type OnboardingService interface {
 	StartOnboardingProcess(document, fullName, email string) error
@@ -108,8 +110,7 @@ func generateVerificationToken() (rawToken string, hashedToken string, err error
 }
 
 func (s *onboardingService) sendEmail(fullName, email, rawToken string) error {
-	subject := "Bem-vindo ao GoBank! Confirme seu e-mail."
-	verificationLink := fmt.Sprintf("%s?token=%s", os.Getenv("FRONTEND_VERIFICATION_URL"), rawToken)
+	verificationLink := fmt.Sprintf("%s/%s?token=%s", os.Getenv("WEBSITE_BASE_URL"), websiteVerifyUrl, rawToken)
 
 	templateData := struct {
 		FullName         string
