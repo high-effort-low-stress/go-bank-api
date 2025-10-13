@@ -48,23 +48,27 @@ paths:
           description: "Conflito. O CPF ou E-mail já está cadastrado."
 
   /onboarding/verify:
-    get:
+    post:
       tags:
         - Onboarding
-      summary: "Valida o token de verificação de e-mail"
-      description: "Endpoint acessado pelo 'link mágico' enviado ao e-mail do usuário. O frontend deve chamar este endpoint para validar o token antes de exibir a tela de criação de senha."
+      summary: "Valida o token de verificação e confirma o e-mail"
+      description: "Endpoint acessado pelo frontend após o usuário clicar no 'link mágico'. Valida o token e atualiza o status da requisição para 'verificado', indicando que o e-mail é válido."
       parameters:
         - name: token
-          in: query
+          in: query 
           required: true
           description: "O token de verificação enviado por e-mail."
           schema:
             type: string
       responses:
         '200':
-          description: "Token válido. O usuário pode prosseguir para a criação de senha."
+          description: "Token válido e verificado com sucesso."
         '400':
-          description: "Token inválido, expirado ou não fornecido."
+          description: "Token inválido ou não fornecido."
+        '404':
+          description: "Requisição de onboarding não encontrada para o token fornecido."
+        '410':
+          description: "Gone. O token já foi usado ou expirou." # Código 410 é mais semântico que 400 para tokens expirados.
   
   /onboarding/complete:
     post:
