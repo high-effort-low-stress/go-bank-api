@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"github.com/high-effort-low-stress/go-bank-api/internal/http_helpers"
 	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/services"
 )
@@ -17,30 +16,29 @@ type StartOnboardingRequest struct {
 }
 
 type OnboardingController struct {
-	service services.OnboardingService
+	createOnboardingService services.OnboardingService
+	verifyEmailTokenService services.VerifyEmailTokenService
 }
 
-func NewOnboardingController(service services.OnboardingService) *OnboardingController {
-	return &OnboardingController{service: service}
+func NewOnboardingController(
+	createOnboardingService services.OnboardingService,
+	verifyEmailTokenService services.VerifyEmailTokenService,
+) *OnboardingController {
+	return &OnboardingController{
+		createOnboardingService: createOnboardingService,
+		verifyEmailTokenService: verifyEmailTokenService,
+	}
 }
 
 func (ctrl *OnboardingController) StartOnboarding(c *gin.Context) {
 	var req StartOnboardingRequest
 
-	if err := c.ShouldBindJSON(&req); err != nil {
-		if validationErrors, ok := err.(validator.ValidationErrors); ok {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error":   "Dados inválidos",
-				"details": http_helpers.FormatValidationErrors(validationErrors),
-			})
-			return
-		}
-
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Corpo da requisição inválido"})
+	if response := http_helpers.ValidateJsonRequest(c, &req); response != nil {
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	err := ctrl.service.StartOnboardingProcess(req.Document, req.FullName, req.Email)
+	err := ctrl.createOnboardingService.StartOnboardingProcess(req.Document, req.FullName, req.Email)
 	if err != nil {
 		if errors.Is(err, services.ErrInvalidCPF) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -55,4 +53,29 @@ func (ctrl *OnboardingController) StartOnboarding(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusAccepted, gin.H{"message": "O e-mail de verificação está sendo enviado."})
+}
+
+func (ctrl *OnboardingController) VerifyEmail(c *gin.Context) {
+	token := c.Query("token")
+	if token == "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": services.ErrInternalServer.Error()})
+	}
+
+	err := ctrl.verifyEmailTokenService.Execute(token)
+
+	if err != nil {
+		if errors.Is(err, services.ErrInvalidToken) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		if errors.Is(err, services.ErrAlreadyVerified) {
+			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": services.ErrInternalServer.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Email verificado com sucesso!"})
+
 }

@@ -64,11 +64,11 @@ paths:
         '200':
           description: "Token válido e verificado com sucesso."
         '400':
-          description: "Token inválido ou não fornecido."
+          description: "Token inválido ou expirado."
         '404':
           description: "Requisição de onboarding não encontrada para o token fornecido."
-        '410':
-          description: "Gone. O token já foi usado ou expirou." # Código 410 é mais semântico que 400 para tokens expirados.
+        '409':
+          description: "Usuário já verificado"
   
   /onboarding/complete:
     post:
