@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  title: "Meu Banco Digital API"
-  description: "API para o core bancário do projeto Meu Banco Digital. Esta definição cobre o fluxo de Onboarding e Autenticação."
+  title: "GoBank API"
+  description: "API para o core bancário do projeto GoBank. Esta definição cobre o fluxo de Onboarding e Autenticação."
   version: "1.0.0"
 
 servers:
