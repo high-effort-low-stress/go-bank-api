@@ -4,43 +4,17 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/high-effort-low-stress/go-bank-api/internal/notification"
 	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/models"
 	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/services"
+	"github.com/high-effort-low-stress/go-bank-api/testutil/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"gorm.io/gorm"
 )
 
-type MockOnboardingRepository struct {
-	mock.Mock
-}
-
-func (m *MockOnboardingRepository) FindByDocumentOrEmail(document, email string) (*models.OnboardingRequest, error) {
-	args := m.Called(document, email)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*models.OnboardingRequest), args.Error(1)
-}
-
-func (m *MockOnboardingRepository) Create(req *models.OnboardingRequest) error {
-	args := m.Called(req)
-	return args.Error(0)
-}
-
-type MockEmailService struct {
-	mock.Mock
-}
-
-func (m *MockEmailService) SendEmail(req *notification.EmailRequest) error {
-	args := m.Called(req)
-	return args.Error(0)
-}
-
 func TestStartOnboardingProcess_Success(t *testing.T) {
-	mockRepo := new(MockOnboardingRepository)
-	mockEmailSvc := new(MockEmailService)
+	mockRepo := new(mocks.MockOnboardingRepository)
+	mockEmailSvc := new(mocks.MockEmailService)
 
 	var wg sync.WaitGroup
 	service := services.NewOnboardingService(mockRepo, mockEmailSvc, &wg)
@@ -62,8 +36,8 @@ func TestStartOnboardingProcess_Success(t *testing.T) {
 }
 
 func TestStartOnboardingProcess_UserAlreadyExists(t *testing.T) {
-	mockRepo := new(MockOnboardingRepository)
-	mockEmail := new(MockEmailService)
+	mockRepo := new(mocks.MockOnboardingRepository)
+	mockEmail := new(mocks.MockEmailService)
 
 	var wg sync.WaitGroup
 	service := services.NewOnboardingService(mockRepo, mockEmail, &wg)
@@ -86,8 +60,8 @@ func TestStartOnboardingProcess_UserAlreadyExists(t *testing.T) {
 }
 
 func TestStartOnboardingProcess_InvalidCPF(t *testing.T) {
-	mockRepo := new(MockOnboardingRepository)
-	mockEmail := new(MockEmailService)
+	mockRepo := new(mocks.MockOnboardingRepository)
+	mockEmail := new(mocks.MockEmailService)
 	var wg sync.WaitGroup
 	service := services.NewOnboardingService(mockRepo, mockEmail, &wg)
 

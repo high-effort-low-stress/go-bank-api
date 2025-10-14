@@ -4,8 +4,26 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
+
+func ValidateJsonRequest(c *gin.Context, req any) gin.H {
+	err := c.ShouldBindJSON(&req)
+	if err == nil {
+		return nil
+	}
+
+	if validationErrors, ok := err.(validator.ValidationErrors); ok {
+		return gin.H{
+			"error":   "Dados inválidos",
+			"details": FormatValidationErrors(validationErrors),
+		}
+	}
+
+	return gin.H{"error": "Corpo da requisição inválido"}
+
+}
 
 func FormatValidationErrors(errs validator.ValidationErrors) map[string]string {
 	errorMessages := make(map[string]string)

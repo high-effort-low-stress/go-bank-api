@@ -32,7 +32,8 @@ func main() {
 	// Dependencies
 	onboardingRequestRepository := repositories.NewOnboardingRequestRepository(db)
 	onboardingService := services.NewOnboardingService(onboardingRequestRepository, emailService, nil)
-	onboardingController := controllers.NewOnboardingController(onboardingService)
+	verifyEmailTokenService := services.NewVerifyEmailTokenService(onboardingRequestRepository)
+	onboardingController := controllers.NewOnboardingController(onboardingService, verifyEmailTokenService)
 
 	server := gin.Default()
 
@@ -41,6 +42,7 @@ func main() {
 		onboarding := apiV1.Group("/onboarding")
 		{
 			onboarding.POST("/start", onboardingController.StartOnboarding)
+			onboarding.POST("/verify", onboardingController.VerifyEmail)
 		}
 	}
 

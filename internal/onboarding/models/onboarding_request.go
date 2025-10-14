@@ -19,7 +19,7 @@ const (
 
 // OnboardingRequest representa a tabela onboarding_requests no banco de dados.
 type OnboardingRequest struct {
-	id                    int64            `gorm:"primaryKey;autoIncrement"`
+	ID                    int64            `gorm:"primaryKey;autoIncrement;column:id"`
 	PublicID              string           `gorm:"type:varchar(26);unique;not null"`
 	FullName              string           `gorm:"type:varchar(255);not null"`
 	Email                 string           `gorm:"type:varchar(255);unique;not null"`

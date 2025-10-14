@@ -1,9 +1,6 @@
 package services
 
 import (
-	"crypto/rand"
-	"crypto/sha256"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"log"
@@ -11,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/high-effort-low-stress/go-bank-api/internal/crypto"
 	"github.com/high-effort-low-stress/go-bank-api/internal/notification"
 	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/models"
 	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/repositories"
@@ -58,7 +56,7 @@ func (s *onboardingService) StartOnboardingProcess(document, fullName, email str
 		return ErrUserExists
 	}
 
-	rawToken, hashedToken, err := generateVerificationToken()
+	rawToken, hashedToken, err := crypto.GenerateVerificationToken()
 	if err != nil {
 		log.Printf("Error generating verification token: %v", err)
 		return ErrInternalServer
@@ -93,20 +91,6 @@ func (s *onboardingService) StartOnboardingProcess(document, fullName, email str
 
 	log.Println("Onboarding process started successfully")
 	return nil
-}
-
-func generateVerificationToken() (rawToken string, hashedToken string, err error) {
-	bytes := make([]byte, 32)
-	if _, err := rand.Read(bytes); err != nil {
-		return "", "", err
-	}
-	rawToken = hex.EncodeToString(bytes)
-
-	hasher := sha256.New()
-	hasher.Write([]byte(rawToken))
-	hashedToken = hex.EncodeToString(hasher.Sum(nil))
-
-	return rawToken, hashedToken, nil
 }
 
 func (s *onboardingService) sendEmail(fullName, email, rawToken string) error {
