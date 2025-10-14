@@ -42,7 +42,7 @@ func (s *verifyEmailTokenService) Execute(token string) error {
 	}
 
 	if time.Now().After(onboardingRequest.TokenExpiresAt) {
-		return ErrInvalidToken
+		return ErrExpiredToken
 	}
 
 	if onboardingRequest.Status == models.StatusCompleted {

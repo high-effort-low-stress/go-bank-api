@@ -72,6 +72,10 @@ func (ctrl *OnboardingController) VerifyEmail(c *gin.Context) {
 			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 			return
 		}
+		if errors.Is(err, services.ErrExpiredToken) {
+			c.JSON(http.StatusGone, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": services.ErrInternalServer.Error()})
 		return
 	}
