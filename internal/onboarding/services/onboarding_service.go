@@ -23,7 +23,7 @@ var (
 	ErrInternalServer = errors.New("Ocorreu um erro inesperado")
 )
 
-var websiteVerifyUrl = "verify"
+var websiteVerifyUrl = "onboarding/verify"
 var VerificationEmailTemplatePath = "templates/verification_email.html"
 var subject = "Bem-vindo ao GoBank! Confirme seu e-mail."
 
