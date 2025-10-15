@@ -8,8 +8,10 @@ import (
 	"github.com/high-effort-low-stress/go-bank-api/internal/database"
 	"github.com/high-effort-low-stress/go-bank-api/internal/notification"
 	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/controllers"
-	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/repositories"
-	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/services"
+	onboarding_repositories "github.com/high-effort-low-stress/go-bank-api/internal/onboarding/repositories"
+	onboarding_services "github.com/high-effort-low-stress/go-bank-api/internal/onboarding/services"
+	user_repositories "github.com/high-effort-low-stress/go-bank-api/internal/users/repositories"
+	user_services "github.com/high-effort-low-stress/go-bank-api/internal/users/services"
 	"github.com/joho/godotenv"
 )
 
@@ -30,10 +32,14 @@ func main() {
 	}
 
 	// Dependencies
-	onboardingRequestRepository := repositories.NewOnboardingRequestRepository(db)
-	onboardingService := services.NewOnboardingService(onboardingRequestRepository, emailService, nil)
-	verifyEmailTokenService := services.NewVerifyEmailTokenService(onboardingRequestRepository)
-	onboardingController := controllers.NewOnboardingController(onboardingService, verifyEmailTokenService)
+	onboardingRequestRepository := onboarding_repositories.NewOnboardingRequestRepository(db)
+	userRepository := user_repositories.NewUserRepository(db)
+
+	onboardingService := onboarding_services.NewOnboardingService(onboardingRequestRepository, emailService, nil)
+	verifyEmailTokenService := onboarding_services.NewVerifyEmailTokenService(onboardingRequestRepository)
+	createUserService := user_services.NewCreateUserService(userRepository)
+	completeOnboardingService := onboarding_services.NewCompleteOnboardingService(onboardingRequestRepository, createUserService)
+	onboardingController := controllers.NewOnboardingController(onboardingService, verifyEmailTokenService, completeOnboardingService)
 
 	server := gin.Default()
 
@@ -43,6 +49,7 @@ func main() {
 		{
 			onboarding.POST("/start", onboardingController.StartOnboarding)
 			onboarding.POST("/verify", onboardingController.VerifyEmail)
+			onboarding.POST("/complete", onboardingController.CompleteOnboarding)
 		}
 	}
 
