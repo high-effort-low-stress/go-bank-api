@@ -14,7 +14,7 @@ const (
 	StatusPending   OnboardingStatus = "PENDING"
 	StatusVerified  OnboardingStatus = "VERIFIED"
 	StatusCompleted OnboardingStatus = "COMPLETED"
-	StatusFailed    OnboardingStatus = "FAILED"
+	StatusFailed    OnboardingStatus = "EXPIRED"
 )
 
 // OnboardingRequest representa a tabela onboarding_requests no banco de dados.
