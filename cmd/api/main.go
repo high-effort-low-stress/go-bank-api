@@ -20,7 +20,7 @@ var PORT_ENV = "PORT"
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Default().Printf("Error loading .env file")
 	}
 
 	database.Connect()
