@@ -92,14 +92,24 @@ paths:
                   format: password
                   description: "A senha escolhida pelo usuário."
                   example: "S3nh@F0rt3!"
+                confirmPassword:
+                  type: string
+                  format: password
+                  description: "Confirmação da senha."
+                  example: "S3nh@F0rt3!"
               required:
                 - token
                 - password
+                - confirmPassword
       responses:
         '200':
           description: "Cadastro concluído com sucesso. O usuário pode agora fazer login."
         '400':
           description: "Token inválido ou a senha não atende aos critérios de segurança."
+        '409':
+          description: "Usuário já verificado"
+        '410':
+          description: "O token expirou."
 
   /auth/login:
     post:
