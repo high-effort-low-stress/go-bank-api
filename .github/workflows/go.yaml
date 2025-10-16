@@ -1,0 +1,23 @@
+name: Go Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-test-package:
+    name: Build, Test and Export Docker Image
+    permissions:
+      contents: read
+      packages: write
+
+    uses: high-effort-low-stress/workflows/.github/workflows/go-build-test.yaml@main
+    with:
+      image-name: ghcr.io/${{ github.repository }}
+      sha: ${{ github.sha }}
+      go-version: '1.25'
+      go-main-file: cmd/api/main.go
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}

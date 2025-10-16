@@ -7,9 +7,5 @@ docker-compose.yml
 
 *.md
 
-main
-app
-*.exe
-
 .vscode/
 .idea/
