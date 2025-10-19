@@ -20,7 +20,7 @@ var (
 )
 
 type CompleteOnboardingService interface {
-	Execute(token, password, passwordConfirmation string) error
+	Execute(token, password, confirmPassword string) error
 }
 
 type completeOnboardingService struct {
@@ -35,8 +35,8 @@ func NewCompleteOnboardingService(
 	return &completeOnboardingService{onboardingRepo: onboardingRepo, createUserService: createUserService}
 }
 
-func (s *completeOnboardingService) Execute(token, password, passwordConfirmation string) error {
-	if password != passwordConfirmation {
+func (s *completeOnboardingService) Execute(token, password, confirmPassword string) error {
+	if password != confirmPassword {
 		return ErrPasswordsDoNotMatch
 	}
 

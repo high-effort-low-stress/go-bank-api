@@ -17,9 +17,9 @@ type StartOnboardingRequest struct {
 }
 
 type CompleteOnboardingRequest struct {
-	Token                string `json:"token" binding:"required"`
-	Password             string `json:"password" binding:"required,min=8"`
-	PasswordConfirmation string `json:"passwordConfirmation" binding:"required,min=8"`
+	Token           string `json:"token" binding:"required"`
+	Password        string `json:"password" binding:"required,min=8"`
+	ConfirmPassword string `json:"confirmPassword" binding:"required,min=8"`
 }
 
 type OnboardingController struct {
@@ -104,7 +104,7 @@ func (ctrl *OnboardingController) CompleteOnboarding(c *gin.Context) {
 		return
 	}
 
-	err := ctrl.completeOnboardingService.Execute(req.Token, req.Password, req.PasswordConfirmation)
+	err := ctrl.completeOnboardingService.Execute(req.Token, req.Password, req.ConfirmPassword)
 	if err == nil {
 		c.JSON(http.StatusOK, gin.H{"message": "Cadastro concluído com sucesso."})
 		return
