@@ -1,7 +1,9 @@
 services:
   go-bank-api:
-    build: .
-    image: go-bank-api:latest
+    build:
+      context: .
+      dockerfile: local.Dockerfile
+    pull_policy: always
     container_name: go-bank-api
     ports:
       - "8080:8080"
