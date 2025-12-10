@@ -3,7 +3,9 @@ EXPOSE 8080
 WORKDIR /app
 
 COPY app .
-RUN mkdir templates
+
+RUN chmod +x ./app
+
 COPY templates/* templates
 
 CMD ["./app"]
