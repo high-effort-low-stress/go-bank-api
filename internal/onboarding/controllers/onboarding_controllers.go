@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/high-effort-low-stress/go-bank-api/internal/http_helpers"
 	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/services"
+	"github.com/high-effort-low-stress/go-bank-api/internal/utils/http_helpers"
 )
 
 type StartOnboardingRequest struct {

@@ -1,0 +1,6 @@
+CREATE SEQUENCE "user".account_number_seq
+    START WITH 12250400
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;

@@ -5,11 +5,11 @@ import (
 	"log"
 	"time"
 
-	"github.com/high-effort-low-stress/go-bank-api/internal/crypto"
 	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/models"
 	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/repositories"
 	user_services "github.com/high-effort-low-stress/go-bank-api/internal/users/services"
-	"github.com/high-effort-low-stress/go-bank-api/internal/validators"
+	"github.com/high-effort-low-stress/go-bank-api/internal/utils/crypto"
+	"github.com/high-effort-low-stress/go-bank-api/internal/utils/validators"
 	"gorm.io/gorm"
 )
 

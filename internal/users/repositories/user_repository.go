@@ -5,6 +5,8 @@ import (
 	"gorm.io/gorm"
 )
 
+const AGENCY_NUMBER = "0001"
+
 type UserRepository interface {
 	CreateUserWithAccount(user *models.User) (*models.User, *models.Account, error)
 }
@@ -44,4 +46,14 @@ func (r *userRepository) CreateUserWithAccount(user *models.User) (*models.User,
 	})
 
 	return createdUser, createdAccount, err
+}
+
+func generateAccountNumber(tx *gorm.DB) (string, error) {
+	var nextVal int64
+	err := tx.Raw("SELECT nextval('account_number_seq')").Scan(&nextVal).Error
+	if err != nil {
+		return "", err // Falha ao obter o número, a transação será revertida.
+	}
+
+	return "", nil
 }

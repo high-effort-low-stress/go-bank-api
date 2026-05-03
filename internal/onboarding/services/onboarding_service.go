@@ -8,11 +8,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/high-effort-low-stress/go-bank-api/internal/crypto"
 	"github.com/high-effort-low-stress/go-bank-api/internal/notification"
 	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/models"
 	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/repositories"
-	"github.com/high-effort-low-stress/go-bank-api/internal/validators"
+	"github.com/high-effort-low-stress/go-bank-api/internal/utils/crypto"
+	"github.com/high-effort-low-stress/go-bank-api/internal/utils/validators"
 
 	"gorm.io/gorm"
 )

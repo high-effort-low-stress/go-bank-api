@@ -5,9 +5,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/high-effort-low-stress/go-bank-api/internal/crypto"
 	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/models"
 	"github.com/high-effort-low-stress/go-bank-api/internal/onboarding/repositories"
+	"github.com/high-effort-low-stress/go-bank-api/internal/utils/crypto"
 	"gorm.io/gorm"
 )
 

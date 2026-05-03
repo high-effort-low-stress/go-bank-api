@@ -1,9 +1,9 @@
 package services
 
 import (
-	"github.com/high-effort-low-stress/go-bank-api/internal/crypto"
 	"github.com/high-effort-low-stress/go-bank-api/internal/users/models"
 	"github.com/high-effort-low-stress/go-bank-api/internal/users/repositories"
+	"github.com/high-effort-low-stress/go-bank-api/internal/utils/crypto"
 )
 
 type CreateServiceRequest struct {
