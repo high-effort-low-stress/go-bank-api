@@ -1,3 +1,4 @@
+// Package notification provides functionality for sending notifications, specifically via email using the Resend service.
 package notification
 
 import (
@@ -39,6 +40,9 @@ func NewEmailService() (EmailService, error) {
 
 func (s *resendEmailService) SendEmail(request *EmailRequest) error {
 	body, err := s.buildEmailContent(request.TemplatePath, request.TemplateData)
+	if err != nil {
+		return fmt.Errorf("failed to build email content: %w", err)
+	}
 
 	params := &resend.SendEmailRequest{
 		From:    request.From,

@@ -14,9 +14,9 @@ import (
 )
 
 var (
-	ErrRequestNotVerified  = errors.New("A solicitação de onboarding não foi verificada")
-	ErrPasswordsDoNotMatch = errors.New("As senhas não coincidem")
-	ErrWeakPassword        = errors.New("A senha não atende aos critérios de segurança")
+	ErrRequestNotVerified  = errors.New("a solicitação de onboarding não foi verificada")
+	ErrPasswordsDoNotMatch = errors.New("as senhas não coincidem")
+	ErrWeakPassword        = errors.New("a senha não atende aos critérios de segurança")
 )
 
 type CompleteOnboardingService interface {
@@ -72,7 +72,6 @@ func (s *completeOnboardingService) Execute(token, password, confirmPassword str
 		DocumentNumber: onboardingRequest.DocumentNumber,
 		Password:       password,
 	})
-
 	if err != nil {
 		log.Printf("Error creating user and account: %v", err)
 		return ErrInternalServer

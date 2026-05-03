@@ -1,3 +1,4 @@
+// Package validators provides functions for validating user input data, such as CPF and password complexity.
 package validators
 
 import "regexp"
@@ -10,7 +11,6 @@ import "regexp"
 // - At least one special character
 
 func ValidatePasswordPattern(plaintextPassword string) bool {
-
 	if len(plaintextPassword) < 8 || len(plaintextPassword) > 64 {
 		return false
 	}

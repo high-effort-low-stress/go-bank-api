@@ -1,3 +1,4 @@
+// Package models define the data structures for the onboarding process.
 package models
 
 import (

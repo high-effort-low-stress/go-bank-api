@@ -1,3 +1,4 @@
+// Package http_helpers provides helper functions for handling HTTP requests and responses, including JSON validation and error formatting.
 package http_helpers
 
 import (
@@ -22,7 +23,6 @@ func ValidateJsonRequest(c *gin.Context, req any) gin.H {
 	}
 
 	return gin.H{"error": "Corpo da requisição inválido"}
-
 }
 
 func FormatValidationErrors(errs validator.ValidationErrors) map[string]string {

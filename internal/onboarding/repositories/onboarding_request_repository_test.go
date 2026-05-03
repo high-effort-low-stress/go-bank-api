@@ -90,7 +90,7 @@ func TestOnboardingRequestFindByDocumentOrEmail(t *testing.T) {
 	t.Run("#method FindByDocumentOrEmail", func(t *testing.T) {
 		expectedFullName := "Jane Doe"
 		expectedEmail := "jane.doe@example.com"
-		expectedPublicId := "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+		expectedPublicID := "01ARZ3NDEKTSV4RRFFQ69G5FAV"
 		expectedDocument := "12345678901"
 
 		insertDB, err := testutil.ReadFileContent(filepath.Join(sqldir, "test", "add-onboarding-requests.sql"))
@@ -98,16 +98,16 @@ func TestOnboardingRequestFindByDocumentOrEmail(t *testing.T) {
 
 		db.Exec(insertDB)
 
-		foundRequest, err := repo.FindByDocumentOrEmail(expectedDocument, "some-other-email@test.com")
+		foundRequest, _ := repo.FindByDocumentOrEmail(expectedDocument, "some-other-email@test.com")
 		foundRequest2, err := repo.FindByDocumentOrEmail("1234567810", expectedEmail)
 
 		require.NoError(t, err)
 		assert.Equal(t, expectedEmail, foundRequest.Email)
 		assert.Equal(t, expectedFullName, foundRequest.FullName)
-		assert.Equal(t, expectedPublicId, foundRequest.PublicID)
+		assert.Equal(t, expectedPublicID, foundRequest.PublicID)
 
 		assert.Equal(t, expectedEmail, foundRequest2.Email)
 		assert.Equal(t, expectedFullName, foundRequest2.FullName)
-		assert.Equal(t, expectedPublicId, foundRequest2.PublicID)
+		assert.Equal(t, expectedPublicID, foundRequest2.PublicID)
 	})
 }

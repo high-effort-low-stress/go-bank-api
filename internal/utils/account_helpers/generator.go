@@ -1,3 +1,4 @@
+// Package accounthelpers provides helper functions for account-related operations, such as generating check digits.
 package accounthelpers
 
 import (
@@ -34,5 +35,4 @@ func GenerateDigit(numero string) (int, error) {
 	}
 
 	return dv, nil
-
 }

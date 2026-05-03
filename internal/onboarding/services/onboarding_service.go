@@ -1,3 +1,4 @@
+// Package services define the business logic for the onboarding process.
 package services
 
 import (
@@ -18,14 +19,16 @@ import (
 )
 
 var (
-	ErrInvalidCPF     = errors.New("CPF inválido")
-	ErrUserExists     = errors.New("O CPF ou E-mail já está cadastrado")
-	ErrInternalServer = errors.New("Ocorreu um erro inesperado")
+	ErrInvalidCPF     = errors.New("cpf inválido")
+	ErrUserExists     = errors.New("o cpf ou E-mail já está cadastrado")
+	ErrInternalServer = errors.New("ocorreu um erro inesperado")
 )
 
-var websiteVerifyUrl = "verify"
-var VerificationEmailTemplatePath = "templates/verification_email.html"
-var subject = "Bem-vindo ao GoBank! Confirme seu e-mail."
+var (
+	websiteVerifyURL              = "verify"
+	VerificationEmailTemplatePath = "templates/verification_email.html"
+	subject                       = "Bem-vindo ao GoBank! Confirme seu e-mail."
+)
 
 type OnboardingService interface {
 	StartOnboardingProcess(document, fullName, email string) error
@@ -94,7 +97,7 @@ func (s *onboardingService) StartOnboardingProcess(document, fullName, email str
 }
 
 func (s *onboardingService) sendEmail(fullName, email, rawToken string) error {
-	verificationLink := fmt.Sprintf("%s/%s?token=%s", os.Getenv("WEBSITE_BASE_URL"), websiteVerifyUrl, rawToken)
+	verificationLink := fmt.Sprintf("%s/%s?token=%s", os.Getenv("WEBSITE_BASE_URL"), websiteVerifyURL, rawToken)
 
 	templateData := struct {
 		FullName         string
@@ -119,5 +122,4 @@ func (s *onboardingService) sendEmail(fullName, email, rawToken string) error {
 	}
 
 	return nil
-
 }

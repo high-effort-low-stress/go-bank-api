@@ -1,3 +1,4 @@
+// Package controllers define the HTTP handlers for the onboarding process.
 package controllers
 
 import (

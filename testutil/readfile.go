@@ -1,3 +1,4 @@
+// Package testutil provides utility functions for testing, such as reading file contents for templates or mock data.
 package testutil
 
 import (
@@ -9,7 +10,7 @@ import (
 func ReadFileContent(filePath string) (string, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
-		return "", fmt.Errorf("Error opening file: %v\n", err)
+		return "", fmt.Errorf("error opening file: %v", err)
 	}
 	defer file.Close()
 
@@ -17,7 +18,7 @@ func ReadFileContent(filePath string) (string, error) {
 
 	content, err := io.ReadAll(file)
 	if err != nil {
-		return "", fmt.Errorf("Error reading file: %v\n", err)
+		return "", fmt.Errorf("error reading file: %v", err)
 	}
 
 	return string(content), nil

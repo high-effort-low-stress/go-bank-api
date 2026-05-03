@@ -1,3 +1,4 @@
+// Package database provides functionality for connecting to and interacting with the PostgreSQL database using GORM.
 package database
 
 import (

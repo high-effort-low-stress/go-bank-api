@@ -53,5 +53,8 @@ func main() {
 		}
 	}
 
-	server.Run(os.Getenv(PORT_ENV))
+	err = server.Run(os.Getenv(PORT_ENV))
+	if err != nil {
+		log.Fatalf("Failed to start server: %v", err)
+	}
 }

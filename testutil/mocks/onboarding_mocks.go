@@ -1,3 +1,4 @@
+// Package mocks provides mock implementations for onboarding-related interfaces to be used in tests.
 package mocks
 
 import (

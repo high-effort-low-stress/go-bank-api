@@ -1,3 +1,4 @@
+// Package repositories define the data access layer for onboarding requests.
 package repositories
 
 import (

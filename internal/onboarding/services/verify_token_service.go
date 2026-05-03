@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	ErrInvalidToken    = errors.New("Token inválido ou expirado")
-	ErrExpiredToken    = errors.New("Token expirado")
-	ErrAlreadyVerified = errors.New("Usuário já verificado")
+	ErrInvalidToken    = errors.New("token inválido ou expirado")
+	ErrExpiredToken    = errors.New("token expirado")
+	ErrAlreadyVerified = errors.New("usuário já verificado")
 )
 
 type VerifyEmailTokenService interface {

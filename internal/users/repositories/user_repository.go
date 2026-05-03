@@ -1,3 +1,4 @@
+// Package repositories defines the data access layer for user and account entities.
 package repositories
 
 import (
@@ -5,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-const AGENCY_NUMBER = "0001"
+const AgencyNumber = "0001"
 
 type UserRepository interface {
 	CreateUserWithAccount(user *models.User) (*models.User, *models.Account, error)
@@ -25,7 +26,6 @@ func (r *userRepository) CreateUserWithAccount(user *models.User) (*models.User,
 	var createdAccount *models.Account
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
-
 		if err := tx.Create(user).Error; err != nil {
 			return err
 		}

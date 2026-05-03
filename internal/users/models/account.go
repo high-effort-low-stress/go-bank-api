@@ -1,3 +1,4 @@
+// Package models defines the data models for user and account entities.
 package models
 
 import (
