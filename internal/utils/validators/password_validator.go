@@ -10,17 +10,25 @@ import "regexp"
 // - At least one number
 // - At least one special character
 
+var (
+	reLowercase    = regexp.MustCompile(`[a-z]`)
+	reUppercase    = regexp.MustCompile(`[A-Z]`)
+	reNumber       = regexp.MustCompile(`\d`)
+	reSpecial      = regexp.MustCompile(`[!@#$%^&*()_=+ .-]`)
+	reAllowedChars = regexp.MustCompile(`^[a-zA-Z0-9!@#$%^&*()_=+ .-]+$`)
+)
+
 func ValidatePasswordPattern(plaintextPassword string) bool {
 	if len(plaintextPassword) < 8 || len(plaintextPassword) > 64 {
 		return false
 	}
 
-	hasLowercase, _ := regexp.MatchString(`[a-z]`, plaintextPassword)
-	hasUppercase, _ := regexp.MatchString(`[A-Z]`, plaintextPassword)
-	hasNumber, _ := regexp.MatchString(`\d`, plaintextPassword)
-	hasSpecial, _ := regexp.MatchString(`[!@#$%^&*()-_=+]`, plaintextPassword)
+	hasLowercase := reLowercase.MatchString(plaintextPassword)
+	hasUppercase := reUppercase.MatchString(plaintextPassword)
+	hasNumber := reNumber.MatchString(plaintextPassword)
+	hasSpecial := reSpecial.MatchString(plaintextPassword)
 
-	onlyAllowedChars, _ := regexp.MatchString(`^[a-zA-Z0-9!@#$%^&*()-_=+]+$`, plaintextPassword)
+	onlyAllowedChars := reAllowedChars.MatchString(plaintextPassword)
 
 	if !hasLowercase || !hasUppercase || !hasNumber || !hasSpecial || !onlyAllowedChars {
 		return false
